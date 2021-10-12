@@ -1,120 +1,117 @@
-import React from "react";
-import User from "User";
+import React,{Component} from "react";
+import Loader from "./Loader";
 
-class Main extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        user: null,
-        new: false,
-        valuetoDisplay: '',
-        valueTitle: '',
-        value: '',
-      };
-    }
-    componentDidMount() {
-      fetch('https://randomuser.me/api/')
-        .then((res) => res.json())
-        .then((data) =>
-          this.setState({
-            user: data.results[0],
-            valuetoDisplay: '',
-            valueTitle: '',
-            value: '',
-          })
-        );
-    }
-    getRandomUser = () => {
-      fetch('https://randomuser.me/api/')
-        .then((res) => res.json())
-        .then((data) => {
-          this.setState({ 
-              user: data.results[0],
-              valueToDisplay: "",
-              valueTitle: "",
-              value: "" 
-          });
-        });
-    };
-  
-    handleChange = (content) => {
-      console.log(this.state.data);
-      let fullName =
-        this.state.user.name.title +
-        ' ' +
-        this.state.user.name.first +
-        ' ' +
-        this.state.user.name.last;
-  
-      switch (content) {
-        case 'user':
-          this.setState({
-            valueTitle: 'My Name is',
-            value: fullName,
-          });
-          break;
-        case 'mail':
-          this.setState({
-            valueTitle: 'Email Address',
-            value: this.state.user.email,
-          });
-          break;
-  
-        case 'dob':
-          this.setState({
-            valueTitle: 'Age is',
-            value: this.state.user.dob.age,
-          });
-          break;
-  
-        case 'address':
-          this.setState({
-            valueTitle: 'Address is',
-            value:
-              this.state.user.location.street.number +
-              ', ' +
-              this.state.user.location.street.name +
-              ', ' +
-              this.state.user.location.city +
-              ', ' +
-              this.state.user.location.country,
-          });
-          break;
-  
-        case 'phone':
-          this.setState({
-            valueTitle: 'Phone No. is',
-            value: this.state.user.phone,
-          });
-          break;
-  
-        default:
-          break;
-      }
-      this.setState({ valueToDisplay: content });
-    };
-  
-    render() {
-      if (!this.state.user) {
-        return <h1>Loading...</h1>;
-      } else {
-        return (
-          <div className="main-div">
-              <header></header>
-              <main>
-            <User
-              user={this.state.user}
-              valuetoDisplay={this.state.valuetoDisplay}
-              valueTitle={this.state.valueTitle}
-              value={this.state.value}
-              getRandomUser={this.getRandomUser}
-              handleChange={this.handleChange}
-            />
-            </main>
-          </div>
-        );
-      }
+class Main extends Component {
+  constructor(props) {
+    super();
+    this.state = {
+      data: "",
+      value: ""
     }
   }
-  
-  export default Main;
+
+  componentDidMount = () => {
+    fetch("https://randomuser.me/api/")
+      .then((res) => res.json())
+      .then((data) => this.setState({ data, value: "" }));
+  }
+
+  display = () => {
+    let value = this.state.value;
+    let data = this.state.data;
+    switch (value) {
+      case "":
+        return (
+          <>
+            <h2 className="text-xl">My Name is</h2>
+            <h4 className="text-3xl p-2 font-bold">{data.results[0].name.first + " " + data.results[0].name.last}</h4>
+          </>
+        )
+        break;
+      case "mail":
+        return (
+          <>
+            <h2 className="text-xl">My Email is</h2>
+            <h4 className="text-3xl p-2 font-bold">{data.results[0].email}</h4>
+          </>
+        )
+        break;
+      case "phone":
+        return (
+          <>
+            <h2 className="text-xl">My Phone Number is</h2>
+            <h4 className="text-3xl p-2 font-bold">{data.results[0].phone}</h4>
+          </>
+        )
+        break;
+      case "street":
+        return (
+          <>
+            <h2 className="text-xl">My Street is</h2>
+            <h4 className="text-3xl p-2 font-bold">{data.results[0].location.street.number + " " + data.results[0].location.street.name}</h4>
+          </>
+        )
+        break;
+      case "city":
+        return (
+          <>
+            <h2 className="text-xl">My City is</h2>
+            <h4 className="text-3xl p-2 font-bold">{data.results[0].location.city}</h4>
+          </>
+        )
+        break;
+      default:
+        break;
+    }
+  }
+  render() {
+    let data = this.state.data;
+    console.log(data);
+    if (!data) {
+      return <Loader />
+    }
+    return (
+
+      <main className="h-screen flex justify-center items-center">
+        <section className="rounded-lg bg-white w-1/2 shadow-custom">
+          <div className="bg-blue-200 p-4">
+            <img src={data ? data.results[0].picture.large : "/img1.png"} className="w-40 h-40 object-cover rounded-full block mx-auto relative top-16" />
+          </div>
+          <div className="mt-20 text-center pb-8">
+            {
+              this.display()
+            }
+            <div className="flex px-8 mt-12">
+
+              <div className="flex-20">
+                <i className="text-2xl text-center fas fa-envelope-open" onMouseOver={
+                  () => this.setState({ value: "mail" })
+                }></i>
+              </div>
+              <div class="flex-20">
+                <i className="text-2xl text-center fas fa-phone-alt" onMouseOver={
+                  () => this.setState({ value: "phone" })
+                }></i>
+              </div>
+              <div className="flex-20">
+                <i className="text-2xl text-center fas fa-street-view" onMouseOver={
+                  () => this.setState({ value: "street" })
+                }></i>
+              </div>
+              <div className="flex-20">
+                <i className="text-2xl text-center fas fa-city" onMouseOver={
+                  () => this.setState({ value: "city" })
+                }></i>
+              </div>
+
+            </div>
+            <button className="bg-blue-500 px-4 py-2 text-white mt-8 rounded-md" onClick={this.componentDidMount}
+            >{data ? "Random User" : "Loading..."}</button>
+          </div>
+        </section>
+      </main>
+    )
+  }
+}
+
+export default Main;
